@@ -1,0 +1,141 @@
+You have to design and create a functional file explorer
+which runs on the browser. The file structure 
+should reside completely on the browser-end e.g. 
+One should be able to create, edit and delete files on this virtual file system.
+
+Please follow these guidelines while building the app :
+
+Use HTML5's new offline storage features for building the app.
+Your Javascript library usage should be limited to jQuery.
+You are free to use CSS pre-processors for styling.
+You must support two file types- text and images.
+The app must be responsive and function properly on mobile devices.
+
+All the design and interactions should be according to the images in this zip file. You will also find resources in the "resources" folder in the zip file. You can download the file here:
+https://s3-ap-southeast-1.amazonaws.com/he-public-data/file_explorer37a715d.zip
+
+
+The API is broken up into various themes:
+
+Reading and manipulating files: File/Blob, FileList, FileReader
+Creating and writing: Blob(), FileWriter
+Directories and file system access: DirectoryReader, FileEntry/DirectoryEntry, LocalFileSystem
+
+Chrome can be run with the --unlimited-quota-for-files flag
+
+You may need the --allow-file-access-from-files 
+flag if you're debugging your app from file://.
+Not using these flags will result
+in a SECURITY_ERR or QUOTA_EXCEEDED_ERR FileError.
+
+window.requestFileSystem 
+ = window.requestFileSystem || window.webkitRequestFileSystem;
+
+window.requestFileSystem(type, size, successCallback, opt_errorCallback);
+
+------------------------------------------------------------------------
+function onInitFs(fs) {
+  console.log('Opened file system: ' + fs.name);
+}
+
+window.requestFileSystem(window.TEMPORARY, 5*1024*1024 /*5MB*/, onInitFs, errorHandler);
+function errorHandler(e) {
+  var msg = '';
+
+  switch (e.code) {
+    case FileError.QUOTA_EXCEEDED_ERR:
+      msg = 'QUOTA_EXCEEDED_ERR';
+      break;
+    case FileError.NOT_FOUND_ERR:
+      msg = 'NOT_FOUND_ERR';
+      break;
+    case FileError.SECURITY_ERR:
+      msg = 'SECURITY_ERR';
+      break;
+    case FileError.INVALID_MODIFICATION_ERR:
+      msg = 'INVALID_MODIFICATION_ERR';
+      break;
+    case FileError.INVALID_STATE_ERR:
+      msg = 'INVALID_STATE_ERR';
+      break;
+    default:
+      msg = 'Unknown Error';
+      break;
+  };
+
+  console.log('Error: ' + msg);
+};
+
+window.webkitStorageInfo.requestQuota(PERSISTENT, 1024*1024, function(grantedBytes) {
+  window.requestFileSystem(PERSISTENT, grantedBytes, onInitFs, errorHandler);
+}, function(e) {
+  console.log('Error', e);
+});
+------------------------------------------------------------------------
+
+Files in the sandboxed environment are represented 
+by the FileEntry interface. A FileEntry contains 
+the types of properties (name, isFile, ...) 
+and methods (remove, moveTo, copyTo, ...) 
+that you'd expect from a standard file system.
+
+Properties and methods of FileEntry:
+
+fileEntry.isFile === true
+fileEntry.isDirectory === false
+fileEntry.name
+fileEntry.fullPath
+...
+
+fileEntry.getMetadata(successCallback, opt_errorCallback);
+fileEntry.remove(successCallback, opt_errorCallback);
+fileEntry.moveTo(dirEntry, opt_newName, opt_successCallback, opt_errorCallback);
+fileEntry.copyTo(dirEntry, opt_newName, opt_successCallback, opt_errorCallback);
+fileEntry.getParent(successCallback, opt_errorCallback);
+fileEntry.toURL(opt_mimeType);
+
+fileEntry.file(successCallback, opt_errorCallback);
+fileEntry.createWriter(successCallback, opt_errorCallback);
+...
+
+function onInitFs(fs) {
+
+  fs.root.getFile('log.txt', {create: true, exclusive: true}, function(fileEntry) {
+
+    // fileEntry.isFile === true
+    // fileEntry.name == 'log.txt'
+    // fileEntry.fullPath == '/log.txt'
+
+  }, errorHandler);
+
+}
+Creating a file
+window.requestFileSystem(window.TEMPORARY, 1024*1024, onInitFs, errorHandler);
+
+Reading a file by name
+
+The following code retrieves the file called "log.txt", its contents are read using the FileReader API and appended to a new <textarea> on the page. If log.txt doesn't exist, an error is thrown.
+
+function onInitFs(fs) {
+
+  fs.root.getFile('log.txt', {}, function(fileEntry) {
+
+    // Get a File object representing the file,
+    // then use FileReader to read its contents.
+    fileEntry.file(function(file) {
+       var reader = new FileReader();
+
+       reader.onloadend = function(e) {
+         var txtArea = document.createElement('textarea');
+         txtArea.value = this.result;
+         document.body.appendChild(txtArea);
+       };
+
+       reader.readAsText(file);
+    }, errorHandler);
+
+  }, errorHandler);
+
+}
+
+window.requestFileSystem(window.TEMPORARY, 1024*1024, onInitFs, errorHandler);

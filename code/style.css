@@ -1,0 +1,78 @@
+#filelist{
+	display:flex;
+	flex-direction: row;
+	padding: 5em;
+	flex-wrap: wrap;
+}
+html {
+    font-family: 'Segoe UI';
+}
+.tile{
+	
+	display:flex;
+	flex-direction: column;
+	flex-wrap: row;	
+	width: 180px;
+	height: 180px;
+	padding:1em;
+}
+.tile>div:first-child{
+	background-size: contain;
+    background-repeat: no-repeat;
+    background-position-x:50%;
+    flex: 3;
+}
+.mid{
+	flex:.5;
+}
+.tile>div:last-child{
+	text-align:center;
+	color:#5b5b5b;
+	font-size:12px;
+	flex:.5;
+	text-transform: capitalize;
+	white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.img{
+	background-image: url('img/image.png')	
+}
+.txt{
+	background-image: url('img/doc.png')	
+}
+.dir{
+	background-image: url('img/Folder.png')	
+}
+.tile:hover{
+	background-color: rgba(0, 166, 255, 0.2);
+    outline: rgba(0, 96, 197, 0.35) 1px solid;
+}
+.mk_popup{
+	position:absolute;
+	background: white;
+	border:1px solid gray;
+	min-width: 96px;
+	cursor: pointer;
+}
+.mk_popup>div{
+	line-height: 2em;
+	padding-left: 12px;
+    padding-right: 12px;
+}
+.mk_popup>div:hover{
+	background: #2cc2e5;
+	color:white;
+}
+.mk_popup>div:last-child {
+    border-top: 1px solid grey;
+    border-top-style: solid;
+    }
+body{
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
